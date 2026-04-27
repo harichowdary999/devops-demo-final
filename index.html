@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fade Demo</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0f;
+      --surface: #16161a;
+      --border: #2a2a30;
+      --text: #e8e8ec;
+      --muted: #6b6b7a;
+      --accent: #f0e040;
+      --c1: #e84545;
+      --c2: #3dd68c;
+      --c3: #4f8ef7;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    /* subtle grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3rem 3.5rem;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+    }
+
+    /* accent corner line */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -1px; left: 40px;
+      width: 80px; height: 3px;
+      background: var(--accent);
+      border-radius: 0 0 4px 4px;
+    }
+
+    .label {
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 2.5rem;
+    }
+
+    /* ── Color blocks ── */
+    .blocks {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .block-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .block {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 14px;
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+
+    .block::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+
+    #div1 { background: var(--c1); box-shadow: 0 8px 32px rgba(232,69,69,0.35); }
+    #div2 { background: var(--c2); box-shadow: 0 8px 32px rgba(61,214,140,0.3); }
+    #div3 { background: var(--c3); box-shadow: 0 8px 32px rgba(79,142,247,0.35); }
+
+    .block-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── Status dots ── */
+    .status {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: background 0.3s;
+    }
+    .status.visible { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+
+    /* ── Buttons ── */
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    button {
+      flex: 1;
+      padding: 0.75rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button span {
+      position: relative;
+      z-index: 1;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    button:active { transform: translateY(0); }
+
+    #btn1:hover { border-color: var(--c2); color: var(--c2); }
+    #btn2:hover { border-color: var(--c1); color: var(--c1); }
+    #btn3:hover { border-color: var(--c3); color: var(--c3); }
+
+    /* ── Footer info ── */
+    .info {
+      margin-top: 2rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    .speed-legend {
+      display: flex; gap: 0.75rem;
+    }
+
+    .speed-item {
+      display: flex; align-items: center; gap: 0.35rem;
+    }
+
+    .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+    }
+    .dot.r { background: var(--c1); }
+    .dot.g { background: var(--c2); }
+    .dot.b { background: var(--c3); }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <p class="label">jQuery / Fade Effects</p>
+  <h1>Visibility<br>Control</h1>
+
+  <div class="blocks">
+    <div class="block-wrap">
+      <div class="block" id="div1"></div>
+      <div class="status visible" id="s1"></div>
+      <span class="block-label">2 s</span>
+    </div>
+    <div class="block-wrap">
+      <div class="block" id="div2"></div>
+      <div class="status visible" id="s2"></div>
+      <span class="block-label">4 s</span>
+    </div>
+    <div class="block-wrap">
+      <div class="block" id="div3"></div>
+      <div class="status visible" id="s3"></div>
+      <span class="block-label">6 s</span>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button id="btn1"><span>↑ Fade In</span></button>
+    <button id="btn2"><span>↓ Fade Out</span></button>
+    <button id="btn3"><span>⇄ Toggle</span></button>
+  </div>
+
+  <div class="info">
+    <span>Staggered duration</span>
+    <div class="speed-legend">
+      <div class="speed-item"><div class="dot r"></div> fast</div>
+      <div class="speed-item"><div class="dot g"></div> mid</div>
+      <div class="speed-item"><div class="dot b"></div> slow</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function syncStatus(id, statusId) {
+    const el = $(id);
+    const visible = el.is(':visible') && parseFloat(el.css('opacity')) > 0;
+    $(statusId).toggleClass('visible', visible);
+  }
+
+  function afterAll() {
+    setTimeout(() => {
+      syncStatus('#div1','#s1');
+      syncStatus('#div2','#s2');
+      syncStatus('#div3','#s3');
+    }, 6200);
+  }
+
+  $(document).ready(function () {
+
+    $('#btn1').click(function () {
+      $('#div1').fadeIn(2000);
+      $('#div2').fadeIn(4000);
+      $('#div3').fadeIn(6000, function () {
+        syncStatus('#div1','#s1');
+        syncStatus('#div2','#s2');
+        syncStatus('#div3','#s3');
+      });
+    });
+
+    $('#btn2').click(function () {
+      $('#div1').fadeOut(2000);
+      $('#div2').fadeOut(4000);
+      $('#div3').fadeOut(6000, function () {
+        syncStatus('#div1','#s1');
+        syncStatus('#div2','#s2');
+        syncStatus('#div3','#s3');
+      });
+    });
+
+    $('#btn3').click(function () {
+      $('#div1').fadeToggle(2000);
+      $('#div2').fadeToggle(4000);
+      $('#div3').fadeToggle(6000, function () {
+        syncStatus('#div1','#s1');
+        syncStatus('#div2','#s2');
+        syncStatus('#div3','#s3');
+      });
+    });
+
+  });
+</script>
+
+</body>
+</html>
