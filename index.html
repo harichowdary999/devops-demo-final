@@ -13,7 +13,7 @@
     :root {
       --bg: #0d0d0f;
       --surface: #16161a;
-      --border: #2a2a30;
+      --border: #1f2937; /* updated */
       --text: #e8e8ec;
       --muted: #6b6b7a;
       --accent: #f0e040;
@@ -23,7 +23,7 @@
     }
 
     body {
-      background: var(--bg);
+      background: radial-gradient(circle at top, #111827, #020617); /* updated */
       color: var(--text);
       font-family: 'DM Mono', monospace;
       min-height: 100vh;
@@ -33,7 +33,6 @@
       padding: 2rem;
     }
 
-    /* subtle grid background */
     body::before {
       content: '';
       position: fixed;
@@ -57,7 +56,6 @@
       box-shadow: 0 32px 80px rgba(0,0,0,0.5);
     }
 
-    /* accent corner line */
     .card::before {
       content: '';
       position: absolute;
@@ -83,7 +81,6 @@
       margin-bottom: 2.5rem;
     }
 
-    /* ── Color blocks ── */
     .blocks {
       display: flex;
       gap: 1rem;
@@ -125,16 +122,15 @@
       color: var(--muted);
     }
 
-    /* ── Status dots ── */
     .status {
       width: 6px; height: 6px;
       border-radius: 50%;
       background: var(--muted);
       transition: background 0.3s;
     }
+
     .status.visible { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
 
-    /* ── Buttons ── */
     .btn-row {
       display: flex;
       gap: 0.75rem;
@@ -173,7 +169,6 @@
     #btn2:hover { border-color: var(--c1); color: var(--c1); }
     #btn3:hover { border-color: var(--c3); color: var(--c3); }
 
-    /* ── Footer info ── */
     .info {
       margin-top: 2rem;
       padding-top: 1.25rem;
@@ -198,11 +193,13 @@
       width: 6px; height: 6px;
       border-radius: 50%;
     }
+
     .dot.r { background: var(--c1); }
     .dot.g { background: var(--c2); }
     .dot.b { background: var(--c3); }
   </style>
 </head>
+
 <body>
 
 <div class="card">
@@ -250,14 +247,6 @@
     const el = $(id);
     const visible = el.is(':visible') && parseFloat(el.css('opacity')) > 0;
     $(statusId).toggleClass('visible', visible);
-  }
-
-  function afterAll() {
-    setTimeout(() => {
-      syncStatus('#div1','#s1');
-      syncStatus('#div2','#s2');
-      syncStatus('#div3','#s3');
-    }, 6200);
   }
 
   $(document).ready(function () {
